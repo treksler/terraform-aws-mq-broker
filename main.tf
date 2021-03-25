@@ -7,14 +7,14 @@ locals {
 }
 
 resource "random_string" "mq_admin_user" {
-  count   = local.enabled && (var.mq_admin_user == null || var.mq_admin_user == "") ? 1 : 0
+  count   = local.enabled && var.engine_type == "ActiveMQ" && (var.mq_admin_user == null || var.mq_admin_user == "") ? 1 : 0
   length  = 8
   special = false
   number  = false
 }
 
 resource "random_password" "mq_admin_password" {
-  count   = local.enabled && (var.mq_admin_password == null || var.mq_admin_password == "") ? 1 : 0
+  count   = local.enabled && var.engine_type == "ActiveMQ" && (var.mq_admin_password == null || var.mq_admin_password == "") ? 1 : 0
   length  = 16
   special = false
 }
@@ -33,7 +33,7 @@ resource "random_password" "mq_application_password" {
 }
 
 resource "aws_ssm_parameter" "mq_master_username" {
-  count       = local.enabled ? 1 : 0
+  count       = local.enabled && var.engine_type == "ActiveMQ" ? 1 : 0
   name        = format(var.ssm_parameter_name_format, var.ssm_path, "mq_admin_username")
   value       = local.mq_admin_user
   description = "MQ Username for the admin user"
@@ -42,7 +42,7 @@ resource "aws_ssm_parameter" "mq_master_username" {
 }
 
 resource "aws_ssm_parameter" "mq_master_password" {
-  count       = local.enabled ? 1 : 0
+  count       = local.enabled && var.engine_type == "ActiveMQ" ? 1 : 0
   name        = format(var.ssm_parameter_name_format, var.ssm_path, "mq_admin_password")
   value       = local.mq_admin_password
   description = "MQ Password for the admin user"
